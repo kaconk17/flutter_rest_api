@@ -1,48 +1,55 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_rest_api/homepage.dart';
 import 'package:http/http.dart' as http;
+import 'homepage.dart';
 
-class TambahData extends StatefulWidget {
-  const TambahData({super.key});
+class EditData extends StatefulWidget {
+  final Map ListData;
+  const EditData({Key ? key,required this.ListData}) : super(key: key);
 
   @override
-  State<TambahData> createState() => _TambahDataState();
+  State<EditData> createState() => _EditDataState();
 }
 
-class _TambahDataState extends State<TambahData> {
+class _EditDataState extends State<EditData> {
   final formkey = GlobalKey<FormState>();
+  TextEditingController id = TextEditingController();
   TextEditingController nama = TextEditingController();
   TextEditingController alamat = TextEditingController();
   TextEditingController telp = TextEditingController();
   TextEditingController email = TextEditingController();
 
-  Future _simpan() async{
+  Future _update() async{
     final response = await http.post(
-      Uri.parse("https://restfull.mecloud.my.id/default/webService/saveSiswa"),
+      Uri.parse("https://restfull.mecloud.my.id/default/webService/updateSiswa"),
       body: {
+        "id": id.text,
         "nama": nama.text,
-        "alamat":alamat.text,
-        "telp": telp.text,
+        "alamat": alamat.text,
+        "telp":telp.text,
         "email":email.text
       }
     );
-    if (response.statusCode == 200) {
+     if (response.statusCode == 200) {
       return true;
     }
     return false;
   }
   @override
   Widget build(BuildContext context) {
+    id.text = widget.ListData["id"];
+    nama.text = widget.ListData["nama"];
+    alamat.text = widget.ListData["alamat"];
+    telp.text = widget.ListData["telp"];
+    email.text = widget.ListData["email"];
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Tambah Data"),
+        title: Text("Edit data"),
       ),
       body: Stack(
         children: [
           Container(
-            color: Colors.white,
+            color: Color.fromARGB(255, 242, 231, 231),
           ),
           ListView(
             children: [
@@ -57,8 +64,11 @@ class _TambahDataState extends State<TambahData> {
                 controller: nama,
                 decoration: InputDecoration(
                   hintText: "Nama",
+                  
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20)
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide(color: Colors.purple)
                   )
                 ),
                 validator: (value){
@@ -127,7 +137,7 @@ class _TambahDataState extends State<TambahData> {
                   ),
                   onPressed: (){
                     if (formkey.currentState!.validate()) {
-                      _simpan().then((value){
+                      _update().then((value){
                         if(value){
                           //final snackbar = SnackBar(content: const Text("Data Berhasil Disimpan"));
                           final snackBar = SnackBar(
@@ -153,7 +163,8 @@ class _TambahDataState extends State<TambahData> {
                           ),);
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         }
-                      });
+                      }
+                      );
                       Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: ((context)=>Homepage())), (route) => false);
                     }
                   }, 
